@@ -254,9 +254,9 @@ private:
   //High Level Trigger
   HLTConfigProvider hltConfig;
   edm::EDGetTokenT<edm::TriggerResults> hltToken_;
-  std::vector<std::string> elPaths1_, elPaths2_;
+  std::vector<std::string> elPaths1_, elPaths2_, elPaths3_;
   std::vector<std::string> muPaths1_, muPaths2_, muPaths3_;
-  std::vector<std::string> elPaths1, elPaths2;
+  std::vector<std::string> elPaths1, elPaths2, elPaths3;
   std::vector<std::string> muPaths1, muPaths2, muPaths3;
   int  HLT_Ele1, HLT_Ele2, HLT_Ele3;
   int  HLT_Mu1, HLT_Mu2, HLT_Mu3;
@@ -297,6 +297,7 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   hltToken_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("hltToken"))),
   elPaths1_(iConfig.getParameter<std::vector<std::string>>("elPaths1")),
   elPaths2_(iConfig.getParameter<std::vector<std::string>>("elPaths2")),
+  elPaths3_(iConfig.getParameter<std::vector<std::string>>("elPaths3")),
   muPaths1_(iConfig.getParameter<std::vector<std::string>>("muPaths1")),
   muPaths2_(iConfig.getParameter<std::vector<std::string>>("muPaths2")),
   muPaths3_(iConfig.getParameter<std::vector<std::string>>("muPaths3"))//  noiseFilterToken_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("noiseFilter")))
@@ -2042,6 +2043,7 @@ void EDBRTreeMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup
 
   elPaths1.clear();
   elPaths2.clear();
+  elPaths3.clear();
   muPaths1.clear();
   muPaths2.clear();
   muPaths3.clear();
