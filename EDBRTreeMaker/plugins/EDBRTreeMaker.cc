@@ -258,7 +258,7 @@ private:
   std::vector<std::string> muPaths1_, muPaths2_, muPaths3_;
   std::vector<std::string> elPaths1, elPaths2;
   std::vector<std::string> muPaths1, muPaths2, muPaths3;
-  int  HLT_Ele1, HLT_Ele2;
+  int  HLT_Ele1, HLT_Ele2, HLT_Ele3;
   int  HLT_Mu1, HLT_Mu2, HLT_Mu3;
 
 // filter
@@ -603,6 +603,7 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   ///HLT bits
   outTree_->Branch("HLT_Ele1"  ,&HLT_Ele1 ,"HLT_Ele1/I" );
   outTree_->Branch("HLT_Ele2"  ,&HLT_Ele2 ,"HLT_Ele2/I" );
+  outTree_->Branch("HLT_Ele3"  ,&HLT_Ele3 ,"HLT_Ele3/I" );
   outTree_->Branch("HLT_Mu1"   ,&HLT_Mu1  ,"HLT_Mu1/I"  );
   outTree_->Branch("HLT_Mu2"   ,&HLT_Mu2  ,"HLT_Mu2/I"  );
   outTree_->Branch("HLT_Mu3"   ,&HLT_Mu3  ,"HLT_Mu3/I"  );
@@ -1021,6 +1022,12 @@ EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       xtemp2 = (int)trigRes->accept(hltConfig.triggerIndex(elPaths2[i]));
       if(HLT_Ele2<xtemp2) HLT_Ele2=xtemp2;
    }
+   int xtemp3=0;
+   for (size_t i=0; i<elPaths3.size();i++) {
+      xtemp3 = (int)trigRes->accept(hltConfig.triggerIndex(elPaths3[i]));
+      if(HLT_Ele3<xtemp3) HLT_Ele3=xtemp3;
+   }
+
    int mtemp1=0;
    for (size_t i=0; i<muPaths1.size();i++) {
       mtemp1 = (int)trigRes->accept(hltConfig.triggerIndex(muPaths1[i]));
@@ -2002,6 +2009,7 @@ void EDBRTreeMaker::setDummyValues() {
 
      HLT_Ele1=-99;
      HLT_Ele2=-99;
+     HLT_Ele3=-99;
      HLT_Mu1=-99;
      HLT_Mu2=-99;
      HLT_Mu3=-99;
@@ -2082,6 +2090,15 @@ void EDBRTreeMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup
    for (size_t i=0; i < elPaths2.size(); i++) std::cout << "\n Electron paths-2:    " << i<<"  "<<elPaths2[i].c_str() <<"\t"<< std::endl;
    for (size_t i=0; i < muPaths2.size(); i++) std::cout << "\n Muon paths-2:   " << i<<"  "<<muPaths2[i].c_str() <<"\t"<< std::endl;
    std::cout<<"\n*********************************************\n\n";
+
+   for (size_t i = 0; i < elPaths3_.size(); i++) {
+         std::vector<std::string> foundPaths3 = hltConfig.matched( hltConfig.triggerNames(), elPaths3_[i] );
+         while ( !foundPaths3.empty() ){
+               elPaths3.push_back( foundPaths3.back() );
+               foundPaths3.pop_back();
+                                      }
+                                                }
+
    for (size_t i = 0; i < muPaths3_.size(); i++) {
          std::vector<std::string> foundPaths3 = hltConfig.matched( hltConfig.triggerNames(), muPaths3_[i] );
          while ( !foundPaths3.empty() ){
@@ -2091,6 +2108,7 @@ void EDBRTreeMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup
                                                 }
 
    std::cout<<"\n************** HLT-3 Information **************\n";
+   for (size_t i=0; i < elPaths3.size(); i++) std::cout << "\n Electron paths-3:    " << i<<"  "<<elPaths3[i].c_str() <<"\t"<< std::endl;
    for (size_t i=0; i < muPaths3.size(); i++) std::cout << "\n Muon paths-3:   " << i<<"  "<<muPaths3[i].c_str() <<"\t"<< std::endl;
    std::cout<<"\n*********************************************\n\n";
 
