@@ -1,2 +1,1 @@
-#ExoDiBosonResonances
-for 80X
+#B2GVV-MC8X-Version2

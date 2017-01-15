@@ -156,10 +156,13 @@ private:
   edm::Handle< edm::TriggerResults> 			     noiseFilterBits_;
   std::string HBHENoiseFilter_Selector_;
   std::string HBHENoiseIsoFilter_Selector_;
-  std::string CSCHaloNoiseFilter_Selector_;
+  std::string GlobalHaloNoiseFilter_Selector_;
   std::string ECALDeadCellNoiseFilter_Selector_;
   std::string GoodVtxNoiseFilter_Selector_;
   std::string EEBadScNoiseFilter_Selector_;
+  edm::EDGetTokenT<bool>  badMuon_Selector_;
+  edm::EDGetTokenT<bool>  badChargedHadron_Selector_;
+
  // bool doHltFilters_;
 
   // ----------member data ---------------------------
@@ -177,8 +180,8 @@ private:
   double met, metPhi, mtVlep;
   double tau1, tau2, tau3, tau21, sdrop, sdropJEC, massVhadJEC;
 
-  double jetAK8puppi_ptJEC, jetAK8puppi_eta, jetAK8puppi_phi, jetAK8puppi_tau1,  jetAK8puppi_tau2, jetAK8puppi_tau3, jetAK8puppi_tau21,  jetAK8puppi_sd, jetAK8puppi_sdJEC;
-
+  double jetAK8puppi_ptJEC, jetAK8puppi_eta, jetAK8puppi_phi, jetAK8puppi_tau1,  jetAK8puppi_tau2, jetAK8puppi_tau3, jetAK8puppi_tau21,  jetAK8puppi_sd, jetAK8puppi_sdJEC, jetAK8puppi_sdcorr;
+  double new_jetAK8puppi_tau21,  new_jetAK8puppi_sd;
   double ptVhad_2, yVhad_2, phiVhad_2, massVhad_2, sdrop_2;
   double tau1_2, tau2_2, tau3_2, tau21_2;
   double yVhadJEC_2, massVhadJEC_2, sdropJEC_2;
@@ -191,6 +194,7 @@ private:
   double candMass;
   double pt_graviton,pt_graviton1;
   double candMassJEC, candMass2JEC, candMass3JEC, ptVlepJEC, yVlepJEC, phiVlepJEC;
+  double candMasspuppiJEC, candMass2puppiJEC, candMasspuppicorr, candMass2puppicorr;
   double massVlepJEC, mtVlepJEC, delPhilepmetJEC, delPhijetmetJEC, delPhijetmetJEC_2, delPhijetlepJEC, delPhijetlepVJEC_2;
 
   double theWeight;
@@ -204,6 +208,8 @@ private:
   double gen_mu_pt, gen_mu_eta, gen_mu_phi, gen_mu_e;
   double genmatch_ele_pt, genmatch_ele_eta, genmatch_ele_phi, genmatch_ele_e, genmatch_ele_dr;
   double genmatch_mu_pt, genmatch_mu_eta, genmatch_mu_phi, genmatch_mu_e, genmatch_mu_dr;
+  double gentop_pt, gentop_eta, gentop_phi, gentop_mass;
+  double genantitop_pt, genantitop_eta, genantitop_phi, genantitop_mass;
   double ptGenVlep, etaGenVlep, phiGenVlep, massGenVlep;
   double ptGenVhad, etaGenVhad, phiGenVhad, massGenVhad;
   bool IDLoose, IDTight, IDLoose_2, IDTight_2, isHighPt, isHEEP;
@@ -227,6 +233,7 @@ private:
   double METraw_et, METraw_phi, METraw_sumEt;
   double MET_et, MET_phi, MET_sumEt, MET_corrPx, MET_corrPy;
   // AK4 Jets
+  int ak4jet_hf[8],ak4jet_pf[8];
   double ak4jet_pt[8],ak4jet_pt_uncorr[8],ak4jet_eta[8],ak4jet_phi[8],ak4jet_e[8], ak4jet_dr[8]; 
   double ak4jet_csv[8],ak4jet_icsv[8],deltaRAK4AK8[8], ak4jet_IDLoose[8], ak4jet_IDTight[8]; 
 
@@ -254,20 +261,22 @@ private:
   //High Level Trigger
   HLTConfigProvider hltConfig;
   edm::EDGetTokenT<edm::TriggerResults> hltToken_;
-  std::vector<std::string> elPaths1_, elPaths2_, elPaths3_;
-  std::vector<std::string> muPaths1_, muPaths2_, muPaths3_;
-  std::vector<std::string> elPaths1, elPaths2, elPaths3;
-  std::vector<std::string> muPaths1, muPaths2, muPaths3;
-  int  HLT_Ele1, HLT_Ele2, HLT_Ele3;
-  int  HLT_Mu1, HLT_Mu2, HLT_Mu3;
+  std::vector<std::string> elPaths1_, elPaths2_, elPaths3_, elPaths4_, elPaths5_, elPaths6_, elPaths7_, elPaths8_;
+  std::vector<std::string> muPaths1_, muPaths2_, muPaths3_, muPaths4_, muPaths5_, muPaths6_, muPaths7_, muPaths8_, muPaths9_, muPaths10_, muPaths11_, muPaths12_;
+  std::vector<std::string> elPaths1, elPaths2, elPaths3, elPaths4, elPaths5, elPaths6, elPaths7, elPaths8;
+  std::vector<std::string> muPaths1, muPaths2, muPaths3, muPaths4, muPaths5, muPaths6, muPaths7, muPaths8, muPaths9, muPaths10, muPaths11, muPaths12;
+  int  HLT_Ele1, HLT_Ele2, HLT_Ele3, HLT_Ele4, HLT_Ele5, HLT_Ele6, HLT_Ele7, HLT_Ele8;
+  int  HLT_Mu1, HLT_Mu2, HLT_Mu3, HLT_Mu4, HLT_Mu5, HLT_Mu6, HLT_Mu7, HLT_Mu8, HLT_Mu9, HLT_Mu10, HLT_Mu11,  HLT_Mu12;
 
 // filter
   bool passFilter_HBHE_                   ;
   bool passFilter_HBHEIso_                ;
-  bool passFilter_CSCHalo_                ;
+  bool passFilter_GlobalHalo_             ;
   bool passFilter_ECALDeadCell_           ;
   bool passFilter_GoodVtx_                ;
   bool passFilter_EEBadSc_                ;
+  bool passFilter_badMuon_                ;
+  bool passFilter_badChargedHadron_       ;
 
   edm::EDGetTokenT<edm::View<reco::Candidate>> leptonicVSrc_;
   edm::EDGetTokenT<edm::View<pat::Jet>> hadronicVSrc_;
@@ -298,9 +307,23 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   elPaths1_(iConfig.getParameter<std::vector<std::string>>("elPaths1")),
   elPaths2_(iConfig.getParameter<std::vector<std::string>>("elPaths2")),
   elPaths3_(iConfig.getParameter<std::vector<std::string>>("elPaths3")),
+  elPaths4_(iConfig.getParameter<std::vector<std::string>>("elPaths4")),
+  elPaths5_(iConfig.getParameter<std::vector<std::string>>("elPaths6")),
+  elPaths6_(iConfig.getParameter<std::vector<std::string>>("elPaths5")),
+  elPaths7_(iConfig.getParameter<std::vector<std::string>>("elPaths7")),
+  elPaths8_(iConfig.getParameter<std::vector<std::string>>("elPaths8")),
   muPaths1_(iConfig.getParameter<std::vector<std::string>>("muPaths1")),
   muPaths2_(iConfig.getParameter<std::vector<std::string>>("muPaths2")),
-  muPaths3_(iConfig.getParameter<std::vector<std::string>>("muPaths3"))//  noiseFilterToken_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("noiseFilter")))
+  muPaths3_(iConfig.getParameter<std::vector<std::string>>("muPaths3")),
+  muPaths4_(iConfig.getParameter<std::vector<std::string>>("muPaths4")),
+  muPaths5_(iConfig.getParameter<std::vector<std::string>>("muPaths5")),
+  muPaths6_(iConfig.getParameter<std::vector<std::string>>("muPaths6")),
+  muPaths7_(iConfig.getParameter<std::vector<std::string>>("muPaths7")),
+  muPaths8_(iConfig.getParameter<std::vector<std::string>>("muPaths8")),
+  muPaths9_(iConfig.getParameter<std::vector<std::string>>("muPaths9")),
+  muPaths10_(iConfig.getParameter<std::vector<std::string>>("muPaths10")),
+  muPaths11_(iConfig.getParameter<std::vector<std::string>>("muPaths11")),
+  muPaths12_(iConfig.getParameter<std::vector<std::string>>("muPaths12"))//  noiseFilterToken_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("noiseFilter")))
 {
   originalNEvents_ = iConfig.getParameter<int>("originalNEvents");
   crossSectionPb_  = iConfig.getParameter<double>("crossSectionPb");
@@ -351,15 +374,17 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
 // filter
   noiseFilterToken_ = consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("noiseFilter"));
   HBHENoiseFilter_Selector_ =  iConfig.getParameter<std::string> ("noiseFilterSelection_HBHENoiseFilter");
-  HBHENoiseIsoFilter_Selector_ =  iConfig.getParameter<std::string> ("noiseFilterSelection_HBHENoiseIsoFilter");  
+  HBHENoiseIsoFilter_Selector_ =  iConfig.getParameter<std::string> ("noiseFilterSelection_HBHENoiseIsoFilter");
 //  HBHENoiseFilterLoose_Rerun_Selector_     = consumes<bool>(iConfig.getParameter<edm::InputTag>( "noiseFilterSelection_HBHENoiseFilterLoose") ) ;
 //  HBHENoiseFilterTight_Rerun_Selector_     = consumes<bool>(iConfig.getParameter<edm::InputTag>( "noiseFilterSelection_HBHENoiseFilterTight") ) ;
 //  HBHENoiseIsoFilter_Rerun_Selector_     = consumes<bool>(iConfig.getParameter<edm::InputTag>( "noiseFilterSelection_HBHENoiseIsoFilter_rerun") ) ;
 
-  CSCHaloNoiseFilter_Selector_ =  iConfig.getParameter<std::string> ("noiseFilterSelection_CSCTightHaloFilter");
+  GlobalHaloNoiseFilter_Selector_ =  iConfig.getParameter<std::string> ("noiseFilterSelection_GlobalTightHaloFilter");
   ECALDeadCellNoiseFilter_Selector_ =  iConfig.getParameter<std::string> ("noiseFilterSelection_EcalDeadCellTriggerPrimitiveFilter");
   GoodVtxNoiseFilter_Selector_ =  iConfig.getParameter<std::string> ("noiseFilterSelection_goodVertices");
   EEBadScNoiseFilter_Selector_ =  iConfig.getParameter<std::string> ("noiseFilterSelection_eeBadScFilter");
+  badMuon_Selector_ =  consumes<bool>(iConfig.getParameter<edm::InputTag> ("noiseFilterSelection_badMuon"));
+  badChargedHadron_Selector_ =  consumes<bool>(iConfig.getParameter<edm::InputTag> ("noiseFilterSelection_badChargedHadron"));
 
   std::string jecpath = iConfig.getParameter<std::string>("jecpath");
   std::string tmpString;
@@ -490,8 +515,12 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("jetAK8puppi_tau3"          ,&jetAK8puppi_tau3         ,"jetAK8puppi_tau3/D"         );
   outTree_->Branch("jetAK8puppi_tau21"          ,&jetAK8puppi_tau21         ,"jetAK8puppi_tau21/D"         );
   outTree_->Branch("jetAK8puppi_sd"          ,&jetAK8puppi_sd         ,"jetAK8puppi_sd/D"         );
-  outTree_->Branch("jetAK8puppi_sdJEC"          ,&jetAK8puppi_sdJEC         ,"jetAK8puppi_sdJEC/D"         );
 
+  outTree_->Branch("new_jetAK8puppi_tau21"          ,&new_jetAK8puppi_tau21         ,"new_jetAK8puppi_tau21/D"         );
+  outTree_->Branch("new_jetAK8puppi_sd"          ,&new_jetAK8puppi_sd         ,"new_jetAK8puppi_sd/D"         );
+
+  outTree_->Branch("jetAK8puppi_sdJEC"          ,&jetAK8puppi_sdJEC         ,"jetAK8puppi_sdJEC/D"         );
+  outTree_->Branch("jetAK8puppi_sdcorr"          ,&jetAK8puppi_sdcorr         ,"jetAK8puppi_sdcorr/D"         );
   outTree_->Branch("ptVhad_2"          ,&ptVhad_2         ,"ptVhad_2/D"         );
   outTree_->Branch("yVlep"           ,&yVlep          ,"yVlep/D"          );
   outTree_->Branch("yVhad"           ,&yVhad          ,"yVhad/D"          );
@@ -584,7 +613,11 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("jetAK8_phi",&jetAK8_phi,"jetAK8_phi/D");
 
   outTree_->Branch("candMassJEC",&candMassJEC,"candMassJEC/D");
+  outTree_->Branch("candMasspuppiJEC",&candMasspuppiJEC,"candMasspuppiJEC/D");
+  outTree_->Branch("candMasspuppicorr",&candMasspuppicorr,"candMasspuppicorr/D");
   outTree_->Branch("candMass2JEC",&candMass2JEC,"candMass2JEC/D");
+  outTree_->Branch("candMass2puppiJEC",&candMass2puppiJEC,"candMass2puppiJEC/D");
+  outTree_->Branch("candMass2puppicorr",&candMass2puppicorr,"candMass2puppicorr/D");
   outTree_->Branch("candMass3JEC",&candMass3JEC,"candMass3JEC/D");
   outTree_->Branch("ptVlepJEC",&ptVlepJEC,"ptVlepJEC/D");
   outTree_->Branch("yVlepJEC",&yVlepJEC,"yVlepJEC/D");
@@ -605,22 +638,39 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("HLT_Ele1"  ,&HLT_Ele1 ,"HLT_Ele1/I" );
   outTree_->Branch("HLT_Ele2"  ,&HLT_Ele2 ,"HLT_Ele2/I" );
   outTree_->Branch("HLT_Ele3"  ,&HLT_Ele3 ,"HLT_Ele3/I" );
+  outTree_->Branch("HLT_Ele4"  ,&HLT_Ele4 ,"HLT_Ele4/I" );
+  outTree_->Branch("HLT_Ele5"  ,&HLT_Ele5 ,"HLT_Ele5/I" );
+  outTree_->Branch("HLT_Ele6"  ,&HLT_Ele6 ,"HLT_Ele6/I" );
+  outTree_->Branch("HLT_Ele7"  ,&HLT_Ele7 ,"HLT_Ele7/I" );
+  outTree_->Branch("HLT_Ele8"  ,&HLT_Ele8 ,"HLT_Ele8/I" );
   outTree_->Branch("HLT_Mu1"   ,&HLT_Mu1  ,"HLT_Mu1/I"  );
   outTree_->Branch("HLT_Mu2"   ,&HLT_Mu2  ,"HLT_Mu2/I"  );
   outTree_->Branch("HLT_Mu3"   ,&HLT_Mu3  ,"HLT_Mu3/I"  );
-
+  outTree_->Branch("HLT_Mu4"   ,&HLT_Mu4  ,"HLT_Mu4/I"  );
+  outTree_->Branch("HLT_Mu5"   ,&HLT_Mu5  ,"HLT_Mu5/I"  );
+  outTree_->Branch("HLT_Mu6"   ,&HLT_Mu6  ,"HLT_Mu6/I"  );
+  outTree_->Branch("HLT_Mu7"   ,&HLT_Mu7  ,"HLT_Mu7/I"  );
+  outTree_->Branch("HLT_Mu8"   ,&HLT_Mu8  ,"HLT_Mu8/I"  );
+  outTree_->Branch("HLT_Mu9"   ,&HLT_Mu9  ,"HLT_Mu9/I"  );
+  outTree_->Branch("HLT_Mu10"   ,&HLT_Mu10  ,"HLT_Mu10/I"  );
+  outTree_->Branch("HLT_Mu11"   ,&HLT_Mu11  ,"HLT_Mu11/I"  );
+  outTree_->Branch("HLT_Mu12"   ,&HLT_Mu12  ,"HLT_Mu12/I"  );
 // filter
   outTree_->Branch("passFilter_HBHE"                 ,&passFilter_HBHE_                ,"passFilter_HBHE_/O");
   outTree_->Branch("passFilter_HBHEIso"                 ,&passFilter_HBHEIso_                ,"passFilter_HBHEIso_/O");
 //  outTree_->Branch("passFilter_HBHEIsoRerun"                 ,&passFilter_HBHEIsoRerun_                ,"passFilter_HBHEIsoRerun_/O");
 //  outTree_->Branch("passFilter_HBHELooseRerun"                 ,&passFilter_HBHELooseRerun_                ,"passFilter_HBHELooseRerun_/O");
 //  outTree_->Branch("passFilter_HBHETightRerun"                 ,&passFilter_HBHETightRerun_                ,"passFilter_HBHETightRerun_/O");
-  outTree_->Branch("passFilter_CSCHalo"              ,&passFilter_CSCHalo_             ,"passFilter_CSCHalo_/O");
+  outTree_->Branch("passFilter_GlobalHalo"              ,&passFilter_GlobalHalo_             ,"passFilter_GlobalHalo_/O");
   outTree_->Branch("passFilter_ECALDeadCell"         ,&passFilter_ECALDeadCell_        ,"passFilter_ECALDeadCell_/O");
   outTree_->Branch("passFilter_GoodVtx"              ,&passFilter_GoodVtx_             ,"passFilter_GoodVtx_/O");
   outTree_->Branch("passFilter_EEBadSc"              ,&passFilter_EEBadSc_             ,"passFilter_EEBadSc_/O");
+  outTree_->Branch("passFilter_badMuon"                 ,&passFilter_badMuon_                ,"passFilter_badMuon_/O");
+  outTree_->Branch("passFilter_badChargedHadron"                 ,&passFilter_badChargedHadron_                ,"passFilter_badChargedHadron_/O");
 
   /// AK4 Jets Info
+  outTree_->Branch("ak4jet_hf"        , ak4jet_hf       ,"ak4jet_hf[8]/I"       );
+  outTree_->Branch("ak4jet_pf"        , ak4jet_pf       ,"ak4jet_pf[8]/I"       );
   outTree_->Branch("ak4jet_pt"        , ak4jet_pt       ,"ak4jet_pt[8]/D"       );
   outTree_->Branch("ak4jet_pt_uncorr"        , ak4jet_pt_uncorr       ,"ak4jet_pt_uncorr[8]/D"       );
   outTree_->Branch("ak4jet_eta"        , ak4jet_eta       ,"ak4jet_eta[8]/D"       );
@@ -654,6 +704,14 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("genmatch_mu_phi"        ,&genmatch_mu_phi       ,"genmatch_mu_phi/D"       );
   outTree_->Branch("genmatch_mu_e"        ,&genmatch_mu_e       ,"genmatch_mu_e/D"       );
   outTree_->Branch("genmatch_mu_dr"        ,&genmatch_mu_dr       ,"genmatch_mu_dr/D"       );
+  outTree_->Branch("gentop_pt"        ,&gentop_pt       ,"gentop_pt/D"       );
+  outTree_->Branch("gentop_eta"        ,&gentop_eta       ,"gentop_eta/D"       );
+  outTree_->Branch("gentop_phi"        ,&gentop_phi       ,"gentop_phi/D"       );
+  outTree_->Branch("gentop_mass"        ,&gentop_mass       ,"gentop_mass/D"       );
+  outTree_->Branch("genantitop_pt"        ,&genantitop_pt       ,"genantitop_pt/D"       );
+  outTree_->Branch("genantitop_eta"        ,&genantitop_eta       ,"genantitop_eta/D"       );
+  outTree_->Branch("genantitop_phi"        ,&genantitop_phi       ,"genantitop_phi/D"       );
+  outTree_->Branch("genantitop_mass"        ,&genantitop_mass       ,"genantitop_mass/D"       );
   outTree_->Branch("ptGenVlep"        ,&ptGenVlep       ,"ptGenVlep/D"       );
   outTree_->Branch("etaGenVlep"        ,&etaGenVlep       ,"etaGenVlep/D"       );
   outTree_->Branch("phiGenVlep"        ,&phiGenVlep       ,"phiGenVlep/D"       );
@@ -690,7 +748,9 @@ EDBRTreeMaker::looseJetID( const pat::Jet& j ) {
 	int CHM = j.chargedMultiplicity(); 
 	double eta = j.eta();
 
-	return (( (NHF<0.99 && NEMF<0.99 && NumConst>1) && ((abs(eta)<=2.4 && CHF>0 && CHM>0 && CEMF<0.99) || abs(eta)>2.4) && abs(eta)<=3.0  ) || (NEMF<0.90 && NumNeutralParticle>10 && abs(eta)>3.0) );
+//	return (( (NHF<0.99 && NEMF<0.99 && NumConst>1) && ((abs(eta)<=2.4 && CHF>0 && CHM>0 && CEMF<0.99) || abs(eta)>2.4) && abs(eta)<=3.0  ) || (NEMF<0.90 && NumNeutralParticle>10 && abs(eta)>3.0) );
+
+        return ((  (NHF<0.99 && NEMF<0.99 && NumConst>1) && ((abs(eta)<=2.4 && CHF>0 && CHM>0 && CEMF<0.99) || abs(eta)>2.4) && abs(eta)<=2.7 ) || (NHF<0.98 && NEMF>0.01 && NumNeutralParticle>2 && abs(eta)>2.7 && abs(eta)<=3.0 ) || (NEMF<0.90 && NumNeutralParticle>10 && abs(eta)>3.0) ) ;
 
 }
 
@@ -1028,6 +1088,31 @@ EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       xtemp3 = (int)trigRes->accept(hltConfig.triggerIndex(elPaths3[i]));
       if(HLT_Ele3<xtemp3) HLT_Ele3=xtemp3;
    }
+   int xtemp4=0;
+   for (size_t i=0; i<elPaths4.size();i++) {
+      xtemp4 = (int)trigRes->accept(hltConfig.triggerIndex(elPaths4[i]));
+      if(HLT_Ele4<xtemp4) HLT_Ele4=xtemp4;
+   }
+   int xtemp5=0;
+   for (size_t i=0; i<elPaths5.size();i++) {
+      xtemp5 = (int)trigRes->accept(hltConfig.triggerIndex(elPaths5[i]));
+      if(HLT_Ele5<xtemp5) HLT_Ele5=xtemp5;
+   }
+   int xtemp6=0;
+   for (size_t i=0; i<elPaths6.size();i++) {
+      xtemp6 = (int)trigRes->accept(hltConfig.triggerIndex(elPaths6[i]));
+      if(HLT_Ele6<xtemp6) HLT_Ele6=xtemp6;
+   }
+   int xtemp7=0;
+   for (size_t i=0; i<elPaths7.size();i++) {
+      xtemp7 = (int)trigRes->accept(hltConfig.triggerIndex(elPaths7[i]));
+      if(HLT_Ele7<xtemp7) HLT_Ele7=xtemp7;
+   }
+   int xtemp8=0;
+   for (size_t i=0; i<elPaths8.size();i++) {
+      xtemp8 = (int)trigRes->accept(hltConfig.triggerIndex(elPaths8[i]));
+      if(HLT_Ele8<xtemp8) HLT_Ele8=xtemp8;
+   }
 
    int mtemp1=0;
    for (size_t i=0; i<muPaths1.size();i++) {
@@ -1043,6 +1128,51 @@ EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    for (size_t i=0; i<muPaths3.size();i++) {
       mtemp3 = (int)trigRes->accept(hltConfig.triggerIndex(muPaths3[i]));
       if(HLT_Mu3<mtemp3) HLT_Mu3=mtemp3;
+   }
+   int mtemp4=0;
+   for (size_t i=0; i<muPaths4.size();i++) {
+      mtemp4 = (int)trigRes->accept(hltConfig.triggerIndex(muPaths4[i]));
+      if(HLT_Mu4<mtemp4) HLT_Mu4=mtemp4;
+   }
+   int mtemp5=0;
+   for (size_t i=0; i<muPaths5.size();i++) {
+      mtemp5 = (int)trigRes->accept(hltConfig.triggerIndex(muPaths5[i]));
+      if(HLT_Mu5<mtemp5) HLT_Mu5=mtemp5;
+   }
+   int mtemp6=0;
+   for (size_t i=0; i<muPaths6.size();i++) {
+      mtemp6 = (int)trigRes->accept(hltConfig.triggerIndex(muPaths6[i]));
+      if(HLT_Mu6<mtemp6) HLT_Mu6=mtemp6;
+   }
+   int mtemp7=0;
+   for (size_t i=0; i<muPaths7.size();i++) {
+      mtemp7 = (int)trigRes->accept(hltConfig.triggerIndex(muPaths7[i]));
+      if(HLT_Mu7<mtemp7) HLT_Mu7=mtemp7;
+   }
+   int mtemp8=0;
+   for (size_t i=0; i<muPaths8.size();i++) {
+      mtemp8 = (int)trigRes->accept(hltConfig.triggerIndex(muPaths8[i]));
+      if(HLT_Mu8<mtemp8) HLT_Mu8=mtemp8;
+   }
+   int mtemp9=0;
+   for (size_t i=0; i<muPaths9.size();i++) {
+      mtemp9 = (int)trigRes->accept(hltConfig.triggerIndex(muPaths9[i]));
+      if(HLT_Mu9<mtemp9) HLT_Mu9=mtemp9;
+   }
+   int mtemp10=0;
+   for (size_t i=0; i<muPaths10.size();i++) {
+      mtemp10 = (int)trigRes->accept(hltConfig.triggerIndex(muPaths10[i]));
+      if(HLT_Mu10<mtemp10) HLT_Mu10=mtemp10;
+   }
+   int mtemp11=0;
+   for (size_t i=0; i<muPaths11.size();i++) {
+      mtemp11 = (int)trigRes->accept(hltConfig.triggerIndex(muPaths11[i]));
+      if(HLT_Mu11<mtemp11) HLT_Mu11=mtemp11;
+   }
+   int mtemp12=0;
+   for (size_t i=0; i<muPaths12.size();i++) {
+      mtemp12 = (int)trigRes->accept(hltConfig.triggerIndex(muPaths12[i]));
+      if(HLT_Mu12<mtemp12) HLT_Mu12=mtemp12;
    }
 
 
@@ -1132,19 +1262,28 @@ EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     const edm::TriggerNames &names = iEvent.triggerNames(*noiseFilterBits_);
     for (unsigned int i = 0, n = noiseFilterBits_->size(); i < n; ++i) {
       if (names.triggerName(i) == HBHENoiseFilter_Selector_)
-        passFilter_HBHE_  = noiseFilterBits_->accept(i); // TO BE USED
+        passFilter_HBHE_ = noiseFilterBits_->accept(i); // TO BE USED
       if (names.triggerName(i) == HBHENoiseIsoFilter_Selector_)
         passFilter_HBHEIso_ = noiseFilterBits_->accept(i); // TO BE USED
-      if (names.triggerName(i) == CSCHaloNoiseFilter_Selector_)
-        passFilter_CSCHalo_ = noiseFilterBits_->accept(i); // TO BE USED
+      if (names.triggerName(i) == GlobalHaloNoiseFilter_Selector_)
+        passFilter_GlobalHalo_ = noiseFilterBits_->accept(i); // TO BE USED
       if (names.triggerName(i) == ECALDeadCellNoiseFilter_Selector_)
         passFilter_ECALDeadCell_ = noiseFilterBits_->accept(i); // under scrutiny
       if (names.triggerName(i) == GoodVtxNoiseFilter_Selector_)
         passFilter_GoodVtx_ = noiseFilterBits_->accept(i); // TO BE USED
       if (names.triggerName(i) == EEBadScNoiseFilter_Selector_)
-        passFilter_EEBadSc_ = noiseFilterBits_->accept(i); // under scrutiny
-  
+        passFilter_EEBadSc_ = noiseFilterBits_->accept(i); // under scrutiny  
     }
+
+     edm::Handle<bool> badMuonResultHandle;
+     edm::Handle<bool> badChargedHadronResultHandle;
+     iEvent.getByToken(badMuon_Selector_, badMuonResultHandle);
+     iEvent.getByToken(badChargedHadron_Selector_, badChargedHadronResultHandle);
+     passFilter_badMuon_ = *badMuonResultHandle;
+     passFilter_badChargedHadron_ = *badChargedHadronResultHandle;
+     //std::cout<<passFilter_badMuon_<<" "<<passFilter_badChargedHadron_<<std::endl;
+     //
+
 /*    
       edm::Handle<bool> HBHENoiseFilterLooseResultHandle;
 //      iEvent.getByLabel(HBHENoiseFilterLoose_Rerun_Selector_, HBHENoiseFilterLooseResultHandle);
@@ -1197,6 +1336,22 @@ EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 //		{
 //			gen_gra_m=(*genParticles)[ik].mass();
 //			gen_gra_pt=(*genParticles)[ik].pt();
+
+                        const reco::Candidate* ptop = &(*genParticles)[ik];
+//                                if(ptop->pdgId()== 6 && ptop->status()== 1 && (*genParticles)[ik].isPromptFinalState()>0) {
+                                if(ptop->pdgId()== 6) {
+                                gentop_pt = ptop->pt();
+                                gentop_eta = ptop->eta();
+                                gentop_phi = ptop->phi();
+                                gentop_mass = ptop->mass();
+                                }
+//                                if(ptop->pdgId()== -6 && ptop->status()== 1 && (*genParticles)[ik].isPromptFinalState()>0) {
+                                if(ptop->pdgId()== -6) {
+                                genantitop_pt = ptop->pt();
+                                genantitop_eta = ptop->eta();
+                                genantitop_phi = ptop->phi();
+                                genantitop_mass = ptop->mass();
+                                }
 			for(int i=0;(*genParticles)[ik].daughter(i)!=NULL;i++)//loop on graviton daughter
 			{
 				if(abs((*genParticles)[ik].daughter(i)->pdgId())==24)
@@ -1464,6 +1619,13 @@ EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          int usenumber3 = -1; double pt_larger=0;
          int numvhad = puppijets_->size();
          for( int inum = 0; inum< numvhad; inum++){
+           const pat::Jet& Vpuppi = puppijets_->at(inum);
+           if(looseJetID(Vpuppi)<1) continue;     
+           double detatemp=fabs(Vpuppi.eta()-etalep1);
+           double dphitemp=fabs(Vpuppi.phi()-philep1);
+           if(dphitemp>3.1415926) {dphitemp=2*3.1415926-dphitemp;}
+           double drtemp=sqrt(detatemp*detatemp+dphitemp*dphitemp);
+           if(drtemp<0.8) continue;
            if(jetAK8puppi_pt1[inum] > pt_larger && fabs(jetAK8puppi_eta1[inum])<2.4 && inum<3) {pt_larger = jetAK8puppi_pt1[inum]; usenumber3 = inum; continue;}
         }
 
@@ -1478,6 +1640,15 @@ EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                 jetAK8puppi_tau21        = jetAK8puppi_tau2/jetAK8puppi_tau1;
                 jetAK8puppi_sd       =  hadronicVpuppi.userFloat("ak8PFJetsCHSSoftDropMass"); // uncorrected pruned mass
                 jetAK8puppi_sdJEC  =corr_AK8puppiSD[usenumber3]*jetAK8puppi_sd;
+                Double_t gencorrect=1.0;
+                Double_t recocorrect_0eta1p3=1.0;
+                Double_t recocorrect_1p3eta2p5=1.0;
+                gencorrect=1.0-0.321*pow(jetAK8puppi_ptJEC*0.0354,-1.1);
+                recocorrect_0eta1p3=1.09-1.69e-04*jetAK8puppi_ptJEC+3.34e-07*pow(jetAK8puppi_ptJEC,2)-2.47e-10*pow(jetAK8puppi_ptJEC,3)+7.8e-14*pow(jetAK8puppi_ptJEC,4)-8.83e-18*pow(jetAK8puppi_ptJEC,5);
+                recocorrect_1p3eta2p5=1.3-7.76e-04*jetAK8puppi_ptJEC+1.11e-06*pow(jetAK8puppi_ptJEC,2)-6.79e-10*pow(jetAK8puppi_ptJEC,3)+1.87e-13*pow(jetAK8puppi_ptJEC,4)-1.9e-17*pow(jetAK8puppi_ptJEC,5);
+                if (fabs(jetAK8puppi_eta)<=1.3){jetAK8puppi_sdcorr=jetAK8puppi_sd*gencorrect*recocorrect_0eta1p3;}
+                else if (fabs(jetAK8puppi_eta)<2.5 && fabs(jetAK8puppi_eta)>1.3){jetAK8puppi_sdcorr=jetAK8puppi_sd*gencorrect*recocorrect_1p3eta2p5;}
+
          }
 
         }
@@ -1584,6 +1755,23 @@ EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 //           if(jetAK8_pt1[inum] > pt_larger && fabs(jetAK8_eta1[inum])<2.4 && inum<3) {pt_larger = jetAK8_pt1[inum]; usenumber = inum;}
 //	}
         const pat::Jet& hadronicVab = hadronicVs->at(usenumber);
+
+
+                TLorentzVector puppi_softdrop, puppi_softdrop_subjet;
+                auto const & sdSubjetsPuppi = hadronicVab.subjets("SoftDropPuppi");
+                reco::Candidate::LorentzVector uncorrJet;
+                for ( auto const & it : sdSubjetsPuppi ) {
+                  uncorrJet = it->correctedP4(0);
+                  puppi_softdrop_subjet.SetPtEtaPhiM(uncorrJet.pt(),uncorrJet.eta(),uncorrJet.phi(),uncorrJet.mass());
+                  puppi_softdrop+=puppi_softdrop_subjet;
+                }
+                new_jetAK8puppi_sd = puppi_softdrop.Mag();
+                //new_jetAK8puppi_pt = puppi_softdrop.Pt();
+                new_jetAK8puppi_tau21 = hadronicVab.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau2")/ hadronicVab.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau1");
+                //new_puppi_tau2   = hadronicVab.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau2");
+               //new_puppi_tau3   = hadronicVab.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau3");
+
+
 	        ptVhad       = hadronicVab.pt();  // unpruned uncorrected jet pt
                 jetAK8_pt    = jetAK8_pt1[usenumber]; // unpruned corrected jet pt
 	        yVhad        = hadronicVab.eta(); // unpruned (w/o jec) jet eta
@@ -1618,7 +1806,7 @@ EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
                 delPhijetmet = deltaPhi(phiVhad, metPhi);
                 delPhijetlep = deltaPhi(phiVhad, phiVlep);
 
-	 TLorentzVector  glepton, gleptonicV, ghadronicV, gravitonJEC;
+	 TLorentzVector  glepton, gleptonicV, ghadronicV, gravitonJEC, ghadronicVpuppi, gravitonpuppiJEC, ghadronicVpuppicorr, gravitonpuppicorr;
 	 glepton.SetPtEtaPhiE(ptlep1, etalep1, philep1, energylep1);
 	 math::XYZTLorentzVector neutrinoP4 = getNeutrinoP4(MET_et, MET_phi, glepton, 1);
 	 reco::CandidateBaseRef METBaseRef = metHandle->refAt(0);
@@ -1628,15 +1816,22 @@ EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
          WLeptonic.addDaughter(neutrino); 
          AddFourMomenta addP4;
          addP4.set(WLeptonic);
+         ghadronicVpuppi.SetPtEtaPhiM(jetAK8puppi_ptJEC, jetAK8puppi_eta, jetAK8puppi_phi, jetAK8puppi_sdJEC);
+         ghadronicVpuppicorr.SetPtEtaPhiM(jetAK8puppi_ptJEC, jetAK8puppi_eta, jetAK8puppi_phi, jetAK8puppi_sdcorr);
 	 ghadronicV.SetPtEtaPhiM(jetAK8_pt, yVhadJEC, phiVhad, jetAK8_mass);
 	 gleptonicV.SetPtEtaPhiM(WLeptonic.pt(),WLeptonic.eta(),WLeptonic.phi(),WLeptonic.mass());
 	 //gleptonicV.SetPtEtaPhiM(leptonicV.pt(),leptonicV.eta(),leptonicV.phi(),leptonicV.mass());
          gravitonJEC = gleptonicV + ghadronicV;
-
+         gravitonpuppiJEC = gleptonicV + ghadronicVpuppi;
+         gravitonpuppicorr = gleptonicV + ghadronicVpuppicorr;
 
 //cout<< "test SF1" <<endl;
                 candMassJEC     = gravitonJEC.Mag();
+                candMasspuppiJEC     = gravitonpuppiJEC.Mag();
+                candMasspuppicorr     = gravitonpuppicorr.Mag();
                 candMass2JEC     = (ghadronicV + gleptonicV).Mag();
+                candMass2puppiJEC     = (ghadronicVpuppi + gleptonicV).Mag();
+                candMass2puppicorr     = (ghadronicVpuppicorr + gleptonicV).Mag();
                 ptVlepJEC       = WLeptonic.pt();
                 yVlepJEC        = WLeptonic.eta();
                 phiVlepJEC      = WLeptonic.phi();
@@ -1673,6 +1868,8 @@ EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	    double deltaRAK4_AK8 = deltaR((*ak4jets)[ik].eta(),(*ak4jets)[ik].phi(),hadronicVab.eta(),hadronicVab.phi());
 
 	    if( (corr*uncorrJet.pt())>20 && (fabs((*ak4jets)[ik].eta()) < 3.0) && deltaRAK4_AK8>=0.8 && nak4<8){
+                ak4jet_hf[nak4]=(*ak4jets)[ik].hadronFlavour();
+                ak4jet_pf[nak4]=(*ak4jets)[ik].partonFlavour();
                 ak4jet_pt[nak4] =  corr*uncorrJet.pt();
                 ak4jet_pt_uncorr[nak4] =  uncorrJet.pt();  
                 ak4jet_eta[nak4] = (*ak4jets)[ik].eta();
@@ -1769,9 +1966,12 @@ void EDBRTreeMaker::setDummyValues() {
      jetAK8puppi_tau2         = -99;
      jetAK8puppi_tau3         = -99;
      jetAK8puppi_tau21         = -99;
+     new_jetAK8puppi_tau21 = -99;
+     new_jetAK8puppi_sd    = -99;
+
      jetAK8puppi_sd         = -99;
      jetAK8puppi_sdJEC         = -99; 
-
+     jetAK8puppi_sdcorr         = -99;
 
      ptVhad_2         = -99;
      yVlep          = -99;
@@ -1837,6 +2037,14 @@ void EDBRTreeMaker::setDummyValues() {
      genmatch_mu_phi    = -99;
      genmatch_mu_e      = -99;
      genmatch_mu_dr      = -99;
+     gentop_pt  = -99;
+     gentop_eta  = -99;
+     gentop_phi  = -99;
+     gentop_mass  = -99;
+     genantitop_pt  = -99;
+     genantitop_eta  = -99;
+     genantitop_phi  = -99;
+     genantitop_mass  = -99;
      ptGenVlep      = -99;
      etaGenVlep      = -99;
      phiGenVlep      = -99;
@@ -1847,7 +2055,22 @@ void EDBRTreeMaker::setDummyValues() {
      massGenVhad      = -99;
 
 
-
+     ak4jet_hf[0] = -99;
+     ak4jet_hf[1] = -99;
+     ak4jet_hf[2] = -99;
+     ak4jet_hf[3] = -99;
+     ak4jet_hf[4] = -99;
+     ak4jet_hf[5] = -99;
+     ak4jet_hf[6] = -99;
+     ak4jet_hf[7] = -99;
+     ak4jet_pf[0] = -99;
+     ak4jet_pf[1] = -99;
+     ak4jet_pf[2] = -99;
+     ak4jet_pf[3] = -99;
+     ak4jet_pf[4] = -99;
+     ak4jet_pf[5] = -99;
+     ak4jet_pf[6] = -99;
+     ak4jet_pf[7] = -99;     
      ak4jet_pt[0] = -99;
      ak4jet_pt[1] = -99; 
      ak4jet_pt[2] = -99; 
@@ -1995,7 +2218,11 @@ void EDBRTreeMaker::setDummyValues() {
      MET_corrPy = -99;
 
      candMassJEC     =  -99;
+     candMasspuppiJEC     =  -99;
+     candMasspuppicorr    =  -99;
      candMass2JEC     =  -99;
+     candMass2puppiJEC     =  -99;
+     candMass2puppicorr    =  -99;
      candMass3JEC     =  -99;
      ptVlepJEC       =  -99;
      yVlepJEC        =  -99;
@@ -2011,9 +2238,23 @@ void EDBRTreeMaker::setDummyValues() {
      HLT_Ele1=-99;
      HLT_Ele2=-99;
      HLT_Ele3=-99;
+     HLT_Ele4=-99;
+     HLT_Ele5=-99;
+     HLT_Ele6=-99;
+     HLT_Ele7=-99;
+     HLT_Ele8=-99;
      HLT_Mu1=-99;
      HLT_Mu2=-99;
      HLT_Mu3=-99;
+     HLT_Mu4=-99;
+     HLT_Mu5=-99;
+     HLT_Mu6=-99;
+     HLT_Mu7=-99;
+     HLT_Mu8=-99;
+     HLT_Mu9=-99;
+     HLT_Mu10=-99;
+     HLT_Mu11=-99;
+     HLT_Mu12=-99;
 
      theWeight = -99;
      //nump = 0;
@@ -2023,11 +2264,12 @@ void EDBRTreeMaker::setDummyValues() {
 //     passFilter_HBHEIsoRerun_          = false;
 //     passFilter_HBHELooseRerun_        = false;
 //     passFilter_HBHETightRerun_        = false;
-     passFilter_CSCHalo_               = false;
+     passFilter_GlobalHalo_            = false;
      passFilter_ECALDeadCell_          = false;
      passFilter_GoodVtx_               = false;
      passFilter_EEBadSc_               = false;
-   
+     passFilter_badMuon_               = false;
+     passFilter_badChargedHadron_      = false; 
 }
 
 // ------------ method called once each job just before starting event loop  ------------
@@ -2044,10 +2286,23 @@ void EDBRTreeMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup
   elPaths1.clear();
   elPaths2.clear();
   elPaths3.clear();
+  elPaths4.clear();
+  elPaths5.clear();
+  elPaths6.clear();
+  elPaths7.clear();
+  elPaths8.clear();
   muPaths1.clear();
   muPaths2.clear();
   muPaths3.clear();
-
+  muPaths4.clear();
+  muPaths5.clear();
+  muPaths6.clear();
+  muPaths7.clear();
+  muPaths8.clear();
+  muPaths9.clear();
+  muPaths10.clear();
+  muPaths11.clear();
+  muPaths12.clear();
 
   std::cout<<"-----begin-----"<<std::endl;
    bool changed;
@@ -2114,8 +2369,157 @@ void EDBRTreeMaker::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup
    for (size_t i=0; i < muPaths3.size(); i++) std::cout << "\n Muon paths-3:   " << i<<"  "<<muPaths3[i].c_str() <<"\t"<< std::endl;
    std::cout<<"\n*********************************************\n\n";
 
+   for (size_t i = 0; i < elPaths4_.size(); i++) {
+         std::vector<std::string> foundPaths4 = hltConfig.matched( hltConfig.triggerNames(), elPaths4_[i] );
+         while ( !foundPaths4.empty() ){
+               elPaths4.push_back( foundPaths4.back() );
+               foundPaths4.pop_back();
+                                      }
+                                                }
 
+   for (size_t i = 0; i < muPaths4_.size(); i++) {
+         std::vector<std::string> foundPaths4 = hltConfig.matched( hltConfig.triggerNames(), muPaths4_[i] );
+         while ( !foundPaths4.empty() ){
+               muPaths4.push_back( foundPaths4.back() );
+               foundPaths4.pop_back();
+                                      }
+                                                }
 
+   std::cout<<"\n************** HLT-4 Information **************\n";
+   for (size_t i=0; i < elPaths4.size(); i++) std::cout << "\n Electron paths-4:    " << i<<"  "<<elPaths4[i].c_str() <<"\t"<< std::endl;
+   for (size_t i=0; i < muPaths4.size(); i++) std::cout << "\n Muon paths-4:   " << i<<"  "<<muPaths4[i].c_str() <<"\t"<< std::endl;
+   std::cout<<"\n*********************************************\n\n";
+
+   for (size_t i = 0; i < elPaths5_.size(); i++) {
+         std::vector<std::string> foundPaths5 = hltConfig.matched( hltConfig.triggerNames(), elPaths5_[i] );
+         while ( !foundPaths5.empty() ){
+               elPaths5.push_back( foundPaths5.back() );
+               foundPaths5.pop_back();
+                                      }
+                                                }
+
+   for (size_t i = 0; i < muPaths5_.size(); i++) {
+         std::vector<std::string> foundPaths5 = hltConfig.matched( hltConfig.triggerNames(), muPaths5_[i] );
+         while ( !foundPaths5.empty() ){
+               muPaths5.push_back( foundPaths5.back() );
+               foundPaths5.pop_back();
+                                      }
+                                                }
+   std::cout<<"\n************** HLT-5 Information **************\n";
+   for (size_t i=0; i < elPaths5.size(); i++) std::cout << "\n Electron paths-5:    " << i<<"  "<<elPaths5[i].c_str() <<"\t"<< std::endl;
+   for (size_t i=0; i < muPaths5.size(); i++) std::cout << "\n Muon paths-5:   " << i<<"  "<<muPaths5[i].c_str() <<"\t"<< std::endl;
+   std::cout<<"\n*********************************************\n\n";
+
+   for (size_t i = 0; i < elPaths6_.size(); i++) {
+         std::vector<std::string> foundPaths6 = hltConfig.matched( hltConfig.triggerNames(), elPaths6_[i] );
+         while ( !foundPaths6.empty() ){
+               elPaths6.push_back( foundPaths6.back() );
+               foundPaths6.pop_back();
+                                      }
+                                                }
+
+   for (size_t i = 0; i < muPaths6_.size(); i++) {
+         std::vector<std::string> foundPaths6 = hltConfig.matched( hltConfig.triggerNames(), muPaths6_[i] );
+         while ( !foundPaths6.empty() ){
+               muPaths6.push_back( foundPaths6.back() );
+               foundPaths6.pop_back();
+                                      }
+                                                }
+
+   std::cout<<"\n************** HLT-6 Information **************\n";
+   for (size_t i=0; i < elPaths6.size(); i++) std::cout << "\n Electron paths-6:    " << i<<"  "<<elPaths6[i].c_str() <<"\t"<< std::endl;
+   for (size_t i=0; i < muPaths6.size(); i++) std::cout << "\n Muon paths-6:   " << i<<"  "<<muPaths6[i].c_str() <<"\t"<< std::endl;
+   std::cout<<"\n*********************************************\n\n";
+
+   for (size_t i = 0; i < elPaths7_.size(); i++) {
+         std::vector<std::string> foundPaths7 = hltConfig.matched( hltConfig.triggerNames(), elPaths7_[i] );
+         while ( !foundPaths7.empty() ){
+               elPaths7.push_back( foundPaths7.back() );
+               foundPaths7.pop_back();
+                                      }
+                                                }
+
+   for (size_t i = 0; i < muPaths7_.size(); i++) {
+         std::vector<std::string> foundPaths7 = hltConfig.matched( hltConfig.triggerNames(), muPaths7_[i] );
+         while ( !foundPaths7.empty() ){
+               muPaths7.push_back( foundPaths7.back() );
+               foundPaths7.pop_back();
+                                      }
+                                                }
+
+   std::cout<<"\n************** HLT-7 Information **************\n";
+   for (size_t i=0; i < elPaths7.size(); i++) std::cout << "\n Electron paths-7:    " << i<<"  "<<elPaths7[i].c_str() <<"\t"<< std::endl;
+   for (size_t i=0; i < muPaths7.size(); i++) std::cout << "\n Muon paths-7:   " << i<<"  "<<muPaths7[i].c_str() <<"\t"<< std::endl;
+   std::cout<<"\n*********************************************\n\n";
+
+   for (size_t i = 0; i < elPaths8_.size(); i++) {
+         std::vector<std::string> foundPaths8 = hltConfig.matched( hltConfig.triggerNames(), elPaths8_[i] );
+         while ( !foundPaths8.empty() ){
+               elPaths8.push_back( foundPaths8.back() );
+               foundPaths8.pop_back();
+                                      }
+                                                }
+
+   for (size_t i = 0; i < muPaths8_.size(); i++) {
+         std::vector<std::string> foundPaths8 = hltConfig.matched( hltConfig.triggerNames(), muPaths8_[i] );
+         while ( !foundPaths8.empty() ){
+               muPaths8.push_back( foundPaths8.back() );
+               foundPaths8.pop_back();
+                                      }
+                                                }
+
+   std::cout<<"\n************** HLT-8 Information **************\n";
+   for (size_t i=0; i < elPaths8.size(); i++) std::cout << "\n Electron paths-8:    " << i<<"  "<<elPaths8[i].c_str() <<"\t"<< std::endl;
+   for (size_t i=0; i < muPaths8.size(); i++) std::cout << "\n Muon paths-8:   " << i<<"  "<<muPaths8[i].c_str() <<"\t"<< std::endl;
+   std::cout<<"\n*********************************************\n\n";
+
+   for (size_t i = 0; i < muPaths9_.size(); i++) {
+         std::vector<std::string> foundPaths9 = hltConfig.matched( hltConfig.triggerNames(), muPaths9_[i] );
+         while ( !foundPaths9.empty() ){
+               muPaths9.push_back( foundPaths9.back() );
+               foundPaths9.pop_back();
+                                      }
+                                                }
+
+   std::cout<<"\n************** HLT-9 Information **************\n";
+   for (size_t i=0; i < muPaths9.size(); i++) std::cout << "\n Muon paths-9:   " << i<<"  "<<muPaths9[i].c_str() <<"\t"<< std::endl;
+   std::cout<<"\n*********************************************\n\n";
+
+   for (size_t i = 0; i < muPaths10_.size(); i++) {
+         std::vector<std::string> foundPaths10 = hltConfig.matched( hltConfig.triggerNames(), muPaths10_[i] );
+         while ( !foundPaths10.empty() ){
+               muPaths10.push_back( foundPaths10.back() );
+               foundPaths10.pop_back();
+                                      }
+                                                }
+
+   std::cout<<"\n************** HLT-10 Information **************\n";
+   for (size_t i=0; i < muPaths10.size(); i++) std::cout << "\n Muon paths-10:   " << i<<"  "<<muPaths10[i].c_str() <<"\t"<< std::endl;
+   std::cout<<"\n*********************************************\n\n";
+
+   for (size_t i = 0; i < muPaths11_.size(); i++) {
+         std::vector<std::string> foundPaths11 = hltConfig.matched( hltConfig.triggerNames(), muPaths11_[i] );
+         while ( !foundPaths11.empty() ){
+               muPaths11.push_back( foundPaths11.back() );
+               foundPaths11.pop_back();
+                                      }
+                                                }
+
+   std::cout<<"\n************** HLT-11 Information **************\n";
+   for (size_t i=0; i < muPaths11.size(); i++) std::cout << "\n Muon paths-11:   " << i<<"  "<<muPaths11[i].c_str() <<"\t"<< std::endl;
+   std::cout<<"\n*********************************************\n\n";
+
+   for (size_t i = 0; i < muPaths12_.size(); i++) {
+         std::vector<std::string> foundPaths12 = hltConfig.matched( hltConfig.triggerNames(), muPaths12_[i] );
+         while ( !foundPaths12.empty() ){
+               muPaths12.push_back( foundPaths12.back() );
+               foundPaths12.pop_back();
+                                      }
+                                                }
+
+   std::cout<<"\n************** HLT-12 Information **************\n";
+   for (size_t i=0; i < muPaths12.size(); i++) std::cout << "\n Muon paths-12:   " << i<<"  "<<muPaths12[i].c_str() <<"\t"<< std::endl;
+   std::cout<<"\n*********************************************\n\n";
 
 }
 

@@ -14,10 +14,10 @@ vetoEleIdLabel = "veto"
 
 
 #goodElectrons = cms.EDFilter("PATElectronSelector",
-'''GoodElectrons = cms.EDProducer("PATElectronIdSelector",
-                             src = cms.InputTag("slimmedElectrons"),
-                             cut = cms.string("pt > 35 "),#&& abs(eta) < 2.5 "), 
-			     idLabel = cms.string(tightEleIdLabel),
+#'''GoodElectrons = cms.EDProducer("PATElectronIdSelector",
+#                             src = cms.InputTag("slimmedElectrons"),
+#                             cut = cms.string("pt > 35 "),#&& abs(eta) < 2.5 "), 
+#			     idLabel = cms.string(tightEleIdLabel),
 #pt > 90 && abs(eta) < 2.5 "
 #                                              " && ecalDrivenSeed()==1"
 #                                              " && abs(1.0/ecalEnergy() - eSuperClusterOverP()/ecalEnergy())<0.05 "
@@ -30,11 +30,14 @@ vetoEleIdLabel = "veto"
 #                                              "      (isEE() && sigmaIetaIeta()<0.03 && abs(deltaPhiSuperClusterTrackAtVtx())<0.02 && abs(deltaEtaSuperClusterTrackAtVtx())<0.005 && hadronicOverEm()<0.10 ))"
 #                                              " && " + eleisolationCutString
 #                                             )
-                             )
-'''
+#                             )
+#'''
+
 goodElectrons = cms.EDProducer("PATElectronIdSelector",
                              src = cms.InputTag("slimmedElectrons"),
                              #cut = cms.string("pt > 90 "),  # does't work!!!!#&& abs(eta) < 2.5 "), 
+                             trkIsolMap=cms.InputTag("heepIDVarValueMaps","eleTrkPtIso"),
+                             vid=cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV70"),
                              vertex = cms.InputTag("offlineSlimmedPrimaryVertices"),
 			     idLabel = cms.string(tightEleIdLabel),
                              rho = cms.InputTag("fixedGridRhoFastjetAll")
@@ -43,6 +46,8 @@ goodElectrons = cms.EDProducer("PATElectronIdSelector",
 looseElectrons = cms.EDProducer("PATElectronIdSelector",
                              src = cms.InputTag("slimmedElectrons"),
                              #cut = cms.string("pt > 90 "),#&& abs(eta) < 2.5 "), 
+                             trkIsolMap=cms.InputTag("heepIDVarValueMaps","eleTrkPtIso"),
+                             vid=cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV70"),
                              vertex = cms.InputTag("offlineSlimmedPrimaryVertices"),
 			     idLabel = cms.string(looseEleIdLabel),
                              rho = cms.InputTag("fixedGridRhoFastjetAll")
